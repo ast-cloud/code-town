@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import {useRouter} from 'next/router';
 import axios from 'axios';
-import { Typography, Button, Tab, Tabs, CircularProgress, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Typography, Button, Tab, Tabs, CircularProgress, Select, MenuItem, FormControl, InputLabel, Snackbar, Alert } from '@mui/material';
 import { themeColors } from 'ui';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -67,6 +67,18 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
     const [pythonCode, setPythonCode] = useState('');
     const [language, setLanguage] = useState('c');
 
+    const [codeSubmissionStatus, setCodeSubmissionStatus] = useState({'visible':false, 'accepted':false, 'message':''});
+    const [codeSubmissionLoading, setCodeSubmissionLoading] = useState(false);
+
+    const [snackbar, setSnackbar] = useState({open: false, text: '', severity: ''});
+
+    const codeValue = {
+        'c': cCode,
+        'cpp': cppCode,
+        'javascript': javascriptCode,
+        'python': pythonCode
+    };
+
     const editorRef = useRef(null);
 
     useEffect(function(){
@@ -98,9 +110,34 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
         setLanguage(event.target.value as string);
     }
 
-    const handleCodeSubmit = function(){
-        
+    const handleCodeSubmit = async function(){
+        setCodeSubmissionLoading(true);
+        try{
+            var results = await axios.post('/api/submitProblem/'+problemDetails.problemCode, {
+                language: language,
+                code: codeValue[language]
+            });
+            if(results.data.accepted==true){
+                setCodeSubmissionLoading(false);
+                setCodeSubmissionStatus({visible:true, accepted: true, message: results.data.result});
+            }
+            else{
+                setCodeSubmissionLoading(false);
+                setCodeSubmissionStatus({visible:true, accepted: false, message: results.data.result});
+            }
+        }catch(e){
+            setCodeSubmissionLoading(false);
+            setSnackbar({
+                open: true,
+                text: 'Cannot submit code. Please try again!',
+                severity: 'error'
+            });
+        }
     }
+
+    const handleSnackbarClose = () => {
+        setSnackbar({...snackbar, open:false});
+      };
     
 
     if(problemDetails===undefined){
@@ -133,12 +170,7 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
             'cpp': [cpp()],
             'python': [python()]
         };
-        const codeValue = {
-            'javascript': javascriptCode,
-            'c': cCode,
-            'cpp': cppCode,
-            'python': pythonCode
-        };
+        
         const setCodeFunction = function(val){
             if(language==='c'){
                 setCCode(val);
@@ -155,7 +187,7 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
         }
         return(
             <div>
-                <div style={{display:'flex', marginTop:'4vh', marginBottom:'4vh', paddingLeft:'10px'}}>
+                <div style={{display:'flex', marginTop:'20px', marginBottom:'2vh', paddingLeft:'10px'}}>
                     <Button sx={{color:themeColors.Brown}} onClick={()=>{router.back()}}><ArrowBack/></Button>
                     <Typography variant='h5' textAlign='end' justifyContent='center' color='#363636'>{problemDetails.title}</Typography>
                     &nbsp;&nbsp;
@@ -188,13 +220,24 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
                     </div>
                     <div style={{display:'flex', flexDirection:'column'}}>
 
-                        <div style={{width:'50vw', height:'74vh', border:'5px solid lightgrey'}}>
-                            <CodeMirror value={codeValue[language]} lang={languageModes[language]} onChange={(val) => setCodeFunction(val)} ref={editorRef} minHeight="74vh" maxHeight="74vh" basicSetup={{highlightActiveLineGutter: true, highlightActiveLine: true, syntaxHighlighting: true}} style={{fontSize:'20px'}} theme={'dark'} extensions={languageExtensions[language]} onClick={()=>{}} />
+                        <div style={{width:'50vw', height:'70vh', border:'5px solid #282C34', borderRadius:'5px'}}>
+                            <CodeMirror value={codeValue[language]} lang={languageModes[language]} onChange={(val) => setCodeFunction(val)} ref={editorRef} minHeight="70vh" maxHeight="70vh" basicSetup={{highlightActiveLineGutter: true, highlightActiveLine: true, syntaxHighlighting: true}} style={{fontSize:'20px'}} theme={'dark'} extensions={languageExtensions[language]} onClick={()=>{}} />
+                        </div>
+                        <br />
+                        
+                        <div style={{display:codeSubmissionLoading?'flex':'none', justifyContent:'center'}}>
+                            <CircularProgress sx={{color:themeColors.Brown}}/>
+                        </div>
+                        <div style={{display:(!codeSubmissionLoading && codeSubmissionStatus.visible)?'flex':'none', flexDirection:'column', width:'50vw', maxHeight:'200px', overflowY:'auto', border:codeSubmissionStatus.accepted?'5px solid #ccff90':'5px solid #ffcdd2', backgroundColor: codeSubmissionStatus.accepted?'#ccff90':'#ffcdd2', borderRadius:'8px', paddingBottom:'5px'}}>
+                            <Typography variant='subtitle1' fontWeight={'bold'} color={codeSubmissionStatus.accepted?'green':'red'} style={{marginLeft:'5px'}}>Status : </Typography>
+                            <Typography variant='body1' whiteSpace='pre-wrap' color={codeSubmissionStatus.accepted?'green':'red'} style={{marginLeft:'35px'}}>{codeSubmissionStatus.message}</Typography>
                         </div>
                         <br />
                         <Button variant='contained' sx={{width:'100px', alignSelf:'flex-end', backgroundColor:themeColors.Brown}} onClick={handleCodeSubmit}>Submit</Button>
+                       
                     </div>
                 </div>
+                <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={handleSnackbarClose} anchorOrigin={{vertical:'bottom', horizontal:'center'}}><Alert severity={snackbar.severity=='error'?"error":"success"}>{snackbar.text}</Alert></Snackbar>
             </div>
         );
     }
