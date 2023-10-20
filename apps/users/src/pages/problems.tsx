@@ -56,7 +56,7 @@ export default function Problems({session}: any){
           try{
   
             var solved_problems_details = await axios.get('/api/solvedProblems');
-            
+            console.log('solvedProblems?.length - '+solvedProblems);
             if(solved_problems_details.status==200){
               setSolvedProblems(solved_problems_details.data.solvedProblemsDetails);
             }
@@ -128,7 +128,7 @@ export default function Problems({session}: any){
                 </Table>
             </TableContainer>}
 
-            {selectedTab===1 && solvedProblems && <TableContainer component={Paper} sx={{maxWidth:'95vw', minHeight:'55vh', alignSelf:'center'}}>
+            {selectedTab===1 && solvedProblems && solvedProblems?.length!=0 && <TableContainer component={Paper} sx={{maxWidth:'95vw', minHeight:'55vh', alignSelf:'center'}}>
                 <Table sx={{ minWidth: 500 }} aria-label="simple table">
                     <TableHead>
                       <TableRow>
