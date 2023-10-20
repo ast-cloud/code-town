@@ -6,6 +6,9 @@ import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import { isAdminLoggedInState } from '@/store/atoms/user';
 import {useRouter} from 'next/router';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import EditorToolbar, { modules, formats } from "../components/EditorToolbar";
 
 
 type CategoryInfo = {
@@ -23,8 +26,7 @@ export default function AddProblem(){
     const [title, setTitle] = useState('');
     const [difficulty, setDifficulty] = useState('');
     const [category, setCategory] = useState('');
-    const [description, setDescription] = useState('');
-    const [formattedHtmlDescription, setFormattedHtmlDescription] = useState('');
+    const [formattedDescription, setFormattedDescription] = useState('');
     const [inputCases, setInputCases] = useState('');
     const [expectedOutput, setExpectedOutput] = useState('');
 
@@ -38,6 +40,7 @@ export default function AddProblem(){
         severity: ''
       });
 
+    
 
     useEffect(function(){
         const fetchData = async function(){
@@ -93,7 +96,7 @@ export default function AddProblem(){
             title: title,
             difficulty: difficulty,
             category: category,
-            description: description,
+            description: formattedDescription,
             inputCases: inputCases,
             expectedOutput: expectedOutput
         }, {
@@ -105,14 +108,14 @@ export default function AddProblem(){
                 router.push('/');
                 setSnackbar({
                     open: true,
-                    text: 'Login successful',
+                    text: 'Problem added successfully',
                     severity: 'success'
                 });
             }
         }).catch(function(res){
             setSnackbar({
                 open: true,
-                text: 'Login Failed. Please try again!',
+                text: 'Cannot add problem. Please try again!',
                 severity: 'error'
             });
         });
@@ -121,6 +124,11 @@ export default function AddProblem(){
     const handleSnackbarClose = () => {
         setSnackbar({...snackbar, open:false});
       };
+      
+    const QuillOnChange = (value)=>{
+        console.log('Current quill text value - '+String(value));
+        setFormattedDescription(value);
+    }
 
     if(allCategories===undefined){
         return(
@@ -170,34 +178,29 @@ export default function AddProblem(){
                     </FormControl>
                 </div>
     
-                <br />
+                <br /><br />
     
-                <div style={{display:'flex', marginLeft:'1vw', border:'0px solid black', width:'70vw'}}>
-                    <TextField variant='outlined' fullWidth label='Description' multiline minRows={15} maxRows={20} onChange={function(e){setDescription(e.target.value)}}></TextField>
+                <div style={{display:'flex', flexDirection:'column', marginLeft:'1vw', marginRight:'1vw', border:'0px solid black'}}>
+                    {/* <TextField variant='outlined' fullWidth label='Description' multiline minRows={15} maxRows={20} onChange={function(e){setDescription(e.target.value)}}></TextField> */}
+                    <EditorToolbar />
+                    <ReactQuill theme="snow" style={{height:'60vh', width:'90vw', marginBottom:'2vh', border:'1px solid black', borderRadius:'5px', overflow:'auto'}} placeholder='Description' modules={modules} formats={formats} value={formattedDescription} onChange={QuillOnChange} />
                 </div>
-                <br />
-                <div style={{display:'flex', justifyContent:'flex-end', marginRight:'1vw', border:'0px solid black', width:'70vw'}}>
-                    <Button size='small' variant='contained' sx={{textTransform:'none', backgroundColor:themeColors.Brown}} onClick={handleAddProblem}>Save</Button>
-                </div>
-    
-                <br />
-    
-                <div style={{display:'flex', marginLeft:'1vw', border:'0px solid black', width:'70vw'}}>
-                    <TextField variant='outlined' fullWidth label='Input cases' multiline minRows={15} maxRows={20} onChange={function(e){setInputCases(e.target.value)}}></TextField>
-                </div>
-                <br />
-                <div style={{display:'flex', justifyContent:'flex-end', marginRight:'1vw', border:'0px solid black', width:'70vw'}}>
-                    <Button size='small' variant='contained' sx={{textTransform:'none', backgroundColor:themeColors.Brown}}>Save</Button>
-                </div>
-    
-                <br />
-                
-                <div style={{display:'flex', marginLeft:'1vw', border:'0px solid black', width:'70vw'}}>
-                    <TextField variant='outlined' fullWidth label='Expected output' multiline minRows={15} maxRows={20} onChange={function(e){setExpectedOutput(e.target.value)}}></TextField>
-                </div>
-                <br />
-                <div style={{display:'flex', justifyContent:'flex-end', marginRight:'1vw', border:'0px solid black', width:'70vw'}}>
-                    <Button size='small' variant='contained' sx={{textTransform:'none', backgroundColor:themeColors.Brown}}>Save</Button>
+
+                <br /><br />
+
+                <div style={{display:'flex'}}>
+                    <div style={{display:'flex', marginLeft:'1vw', marginRight:'1vw', border:'0px solid black', width:'50vw'}}>
+                        <TextField variant='outlined' fullWidth label='Input cases' multiline minRows={15} maxRows={20} onChange={function(e){setInputCases(e.target.value)}}></TextField>
+                    </div>  
+                    <div style={{display:'flex', marginLeft:'1vw', marginRight:'1vw', border:'0px solid black', width:'50vw'}}>
+                        <TextField variant='outlined' fullWidth label='Expected output' multiline minRows={15} maxRows={20} onChange={function(e){setExpectedOutput(e.target.value)}}></TextField>
+                    </div>
+                </div>    
+
+                <br /><br />
+
+                <div style={{display:'flex', justifyContent:'center', marginRight:'1vw', border:'0px solid black'}}>
+                    <Button size='small' variant='contained' sx={{width:'85px', fontSize:'15px', textTransform:'none', backgroundColor:themeColors.Brown}} onClick={handleAddProblem}>Save</Button>
                 </div>
                 <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={handleSnackbarClose} anchorOrigin={{vertical:'bottom', horizontal:'center'}}><Alert severity={snackbar.severity=='error'?"error":"success"}>{snackbar.text}</Alert></Snackbar>
             </div>
@@ -207,16 +210,16 @@ export default function AddProblem(){
     
 }
 
-function BoldIcon(){
+// function BoldIcon(){
 
-    const [active, setActive] = useState(false);
+//     const [active, setActive] = useState(false);
 
-    return <IconButton size='large' sx={{color:active?'brown':'grey'}} onClick={function(){setActive(!active);}}><FormatBold/></IconButton>
-}
+//     return <IconButton size='large' sx={{color:active?'brown':'grey'}} onClick={function(){setActive(!active);}}><FormatBold/></IconButton>
+// }
 
-function ItalicsIcon(){
+// function ItalicsIcon(){
 
-    const [active, setActive] = useState(false);
+//     const [active, setActive] = useState(false);
 
-    return <IconButton size='large' sx={{color:active?'brown':'grey'}} onClick={function(){setActive(!active);}}><FormatItalic/></IconButton>
-}
+//     return <IconButton size='large' sx={{color:active?'brown':'grey'}} onClick={function(){setActive(!active);}}><FormatItalic/></IconButton>
+// }

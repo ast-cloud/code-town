@@ -11,6 +11,14 @@ const problemSchema = new mongoose.Schema({
     expectedOutput: String,
   });
   
+const solutionSchema = new mongoose.Schema({
+    problemCode: String,
+    c: String,
+    cpp: String,
+    java: String,
+    python: String
+  });
+
 const userSchema = new mongoose.Schema({
     email: String,
     password: String,
@@ -27,3 +35,4 @@ const categorySchema = new mongoose.Schema({
 export const Problem = mongoose.models.Problem || mongoose.model('Problem', problemSchema);
 export const User = mongoose.models.User || mongoose.model('User', userSchema);
 export const Category = mongoose.models.Category || mongoose.model('Category', categorySchema);
+export const Solution = mongoose.models.Solution || mongoose.model('Solution', solutionSchema);

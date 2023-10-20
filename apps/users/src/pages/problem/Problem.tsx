@@ -7,6 +7,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { cpp } from '@codemirror/lang-cpp';
 import { python } from '@codemirror/lang-python';
+import { java } from '@codemirror/lang-java';
 import { EditorView } from '@codemirror/view';
 import {ArrowBack} from '@mui/icons-material';
 import { createTheme } from '@uiw/codemirror-themes';
@@ -52,6 +53,23 @@ const myTheme = createTheme({
     ],
   });
   
+var javaPresetCode = `/* package codetown; // don't place package name! */
+
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+    
+/* Name of the class has to be "Main" only if the class is public. */
+class Codetown
+{
+    public static void main (String[] args) throws java.lang.Exception
+    {
+        // your code goes here
+            
+    }
+}
+`
+
 export default function Problem(props: {problemCode:string|string[]|undefined}){
 
     const router = useRouter();
@@ -63,6 +81,7 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
     
     const [cCode, setCCode] = useState('');
     const [cppCode, setCppCode] = useState('');
+    const [javaCode, setJavaCode] = useState(javaPresetCode);
     const [javascriptCode, setJavascriptCode] = useState('');
     const [pythonCode, setPythonCode] = useState('');
     const [language, setLanguage] = useState('c');
@@ -70,11 +89,16 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
     const [codeSubmissionStatus, setCodeSubmissionStatus] = useState({'visible':false, 'accepted':false, 'message':''});
     const [codeSubmissionLoading, setCodeSubmissionLoading] = useState(false);
 
+    const [selectedTab, setSelectedTab] = useState(0);
+
+    const [solutions, setSolutions] = useState(undefined);
+
     const [snackbar, setSnackbar] = useState({open: false, text: '', severity: ''});
 
     const codeValue = {
         'c': cCode,
         'cpp': cppCode,
+        'java':javaCode,
         'javascript': javascriptCode,
         'python': pythonCode
     };
@@ -84,20 +108,44 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
     useEffect(function(){
 
         const fetchData = async function(){
-            
-            try{
 
-                const problem_details = await axios.get('/api/problem/'+props.problemCode);
-                
-                if(problem_details.status==200){
-                    console.log('problemDetails.data.problem - ', problem_details.data.problem);
-                    setProblemDetails(problem_details.data.problem);
-                }
-                else{
+            if(problemDetails===undefined || problemDetails===null){
+
+                try{
+                    
+                    const problem_details = await axios.get('/api/problem/'+props.problemCode);
+                    
+                    if(problem_details.status==200){
+                        console.log('problemDetails.data.problem - ', problem_details.data.problem);
+                        setProblemDetails(problem_details.data.problem);
+                    }
+                    else{
+                        setProblemDetails(null);
+                    }
+                    
+                }catch(error){
                     setProblemDetails(null);
                 }
+
+            }
+
+            try{
+
+                const all_solutions = await axios.get('/api/solutions/'+props.problemCode);
+                
+                if(all_solutions.status==200){
+                    console.log('problemDetails.data.problem - ', all_solutions.data.solutions);
+                    setSolutions(all_solutions.data.solutions);
+                }
+                else if(all_solutions.status==204){
+                    setSolutions(false);
+                }
+                else{
+                    setSolutions(null);
+                }
+                
             }catch(error){
-                setProblemDetails(null);
+                setSolutions(null);
             }
 
         }
@@ -137,8 +185,11 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
 
     const handleSnackbarClose = () => {
         setSnackbar({...snackbar, open:false});
-      };
+    };
     
+    const handleTabChange = (event: React.SyntheticEvent, newValue: any) => {
+        setSelectedTab(newValue);
+    };
 
     if(problemDetails===undefined){
         return(
@@ -159,15 +210,17 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
     else{
 
         const languageModes = {
-            'javascript': javascript(),
             'c': cpp(),
             'cpp': cpp(),
+            'java': java(),
+            'javascript': javascript(),
             'python': python()
         };
         const languageExtensions = {
-            'javascript': [javascript()],
             'c': [cpp()],
             'cpp': [cpp()],
+            'java': [java()],
+            'javascript': [javascript()],
             'python': [python()]
         };
         
@@ -177,6 +230,9 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
             }
             else if(language==='cpp'){
                 setCppCode(val);
+            }
+            else if(language==='java'){
+                setJavaCode(val);
             }
             else if(language==='javascript'){
                 setJavascriptCode(val);
@@ -195,8 +251,13 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
                 </div>
                 <div style={{height:'7vh', backgroundColor:'#F8F8F8', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
                     <div style={{display:'flex', justifyContent:'space-between', width:'48vw', border:'0px solid black'}}>
-                        <Typography variant='subtitle1' sx={{fontWeight:'bold', marginLeft:'1vw'}}>Statement</Typography>
-                        <Typography variant='subtitle1' sx={{fontWeight:'bold', marginRight:'1vw'}}>Difficulty: {problemDetails.difficulty}</Typography>
+                        {/* <Typography variant='subtitle1' sx={{fontWeight:'bold', marginLeft:'1vw'}}>Statement</Typography> */}
+                            
+                        <Tabs value={selectedTab} onChange={handleTabChange} >
+                            <Tab label='Statement'/>
+                            <Tab label='Solution'/>
+                        </Tabs>
+                        <Typography variant='subtitle1' sx={{fontWeight:'bold', marginRight:'1vw', marginTop:'10px'}}>Difficulty: {problemDetails.difficulty}</Typography>
                     </div>
                     <div style={{display:'flex', justifyContent:'flex-end', width:'52vw', border:'0px solid black'}}>
                         <FormControl>
@@ -204,7 +265,8 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
                             <Select label='Language' labelId='language-dropdown' size='small' sx={{width:200, fontSize:16}} value={language} onChange={handleLanguageChange}>
                                 <MenuItem value='c'>C</MenuItem>
                                 <MenuItem value='cpp'>C++ 14</MenuItem>
-                                <MenuItem value='javascript'>JavaScript</MenuItem>
+                                <MenuItem value='java'>Java</MenuItem>
+                                {/* <MenuItem value='javascript'>JavaScript</MenuItem> */}
                                 <MenuItem value='python'>Python</MenuItem>
                             </Select>
                         </FormControl>
@@ -212,16 +274,37 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
                     
                 </div>
                 <div style={{display:'flex'}}>
-                    <div style={{width:'50vw', height:'auto', paddingLeft:'15px', paddingRight:'15px', paddingTop:'22px', paddingBottom:'20px', overflowX:'auto', border:'0px solid black'}}>
-                        <Typography style={{fontWeight:'lighter', fontSize:'17px', whiteSpace:'pre-wrap'}}>
-                            {problemDetails.description}
-                            <br /><br />
-                        </Typography>
+                    <div style={{width:'50vw', height:'auto', paddingLeft:'20px', paddingRight:'15px', paddingBottom:'20px', overflowX:'auto', border:'0px solid black'}}>
+                        { selectedTab===0 && <Typography style={{fontWeight:'lighter', fontSize:'17px', whiteSpace:'pre-wrap', marginTop:'25px'}} dangerouslySetInnerHTML={{__html:String(problemDetails.description)}} />
+                        //     {problemDetails.description}
+                        // </Typography>
+                        }
+                        <br /><br />
+                        { selectedTab===1 && solutions && <div style={{border:'0px solid black'}}>
+                                <FormControl>
+                                    <InputLabel id='language-dropdown' size='small'>Language</InputLabel>
+                                    <Select label='Language' labelId='language-dropdown' size='small' sx={{width:200, fontSize:16}} value={language} onChange={handleLanguageChange}>
+                                        <MenuItem value='c'>C</MenuItem>
+                                        <MenuItem value='cpp'>C++ 14</MenuItem>
+                                        <MenuItem value='java'>Java</MenuItem>
+                                        {/* <MenuItem value='javascript'>JavaScript</MenuItem> */}
+                                        <MenuItem value='python'>Python</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <br /><br />
+                                <Typography variant='h6' whiteSpace='pre-wrap' marginLeft={'15px'}>{!solutions[language]?`\n ${language.charAt(0).toUpperCase()+language.slice(1)} solution not provided yet!`:solutions[language]}</Typography>
+                            </div>}
+
+                        {selectedTab===1 && solutions===undefined && <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginTop:'20%'}}> <CircularProgress/> </div>}
+
+                        {selectedTab===1 && solutions===null && <div style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', height:'64vh'}}> <Typography variant='h6' sx={{fontWeight:'bold'}}>Cannot load data!</Typography> <br /><br /> <Button variant='contained' size='small' sx={{ textTransform:'none', backgroundColor:'#645cff'}} onClick={function(){setSolutions(undefined); setReRender(!reRender);}}>Refresh</Button> </div>}
+                        {selectedTab===1 && solutions===false && <div style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', height:'64vh'}}> <Typography variant='h6' sx={{}}>No solutions provided yet!</Typography> </div>}
+
                     </div>
                     <div style={{display:'flex', flexDirection:'column'}}>
 
                         <div style={{width:'50vw', height:'70vh', border:'5px solid #282C34', borderRadius:'5px'}}>
-                            <CodeMirror value={codeValue[language]} lang={languageModes[language]} onChange={(val) => setCodeFunction(val)} ref={editorRef} minHeight="70vh" maxHeight="70vh" basicSetup={{highlightActiveLineGutter: true, highlightActiveLine: true, syntaxHighlighting: true}} style={{fontSize:'20px'}} theme={'dark'} extensions={languageExtensions[language]} onClick={()=>{}} />
+                            <CodeMirror value={codeValue[language]} lang={languageModes[language]} onChange={(val) => setCodeFunction(val)} ref={editorRef} minHeight="70vh" maxHeight="70vh" basicSetup={{highlightActiveLineGutter: true, highlightActiveLine: true, syntaxHighlighting: true}} style={{fontSize:'18px'}} theme={'dark'} extensions={[languageExtensions[language], EditorView.lineWrapping]} onClick={()=>{}} />
                         </div>
                         <br />
                         
@@ -233,7 +316,7 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
                             <Typography variant='body1' whiteSpace='pre-wrap' color={codeSubmissionStatus.accepted?'green':'red'} style={{marginLeft:'35px'}}>{codeSubmissionStatus.message}</Typography>
                         </div>
                         <br />
-                        <Button variant='contained' sx={{width:'100px', alignSelf:'flex-end', backgroundColor:themeColors.Brown}} onClick={handleCodeSubmit}>Submit</Button>
+                        <Button variant='contained' sx={{width:'100px', alignSelf:'flex-end', textTransform:'none', letterSpacing:2, backgroundColor:themeColors.Brown}} onClick={handleCodeSubmit}>Submit</Button>
                        
                     </div>
                 </div>

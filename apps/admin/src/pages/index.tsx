@@ -82,7 +82,7 @@ export default function Home() {
     <div style={{display:'flex', flexDirection:'column', minHeight:'78vh'}}>
       
       <div style={{display:'flex', justifyContent:isSmallScreen ? 'space-between' : 'space-between', marginTop:'7vh', marginBottom:'7vh', marginLeft:isSmallScreen ? '0' : '5vw', marginRight:isSmallScreen ? '0' : '5vw', fontWeight:'lighter'}}>
-        <Typography variant='h5' fontWeight='normal'>All courses</Typography>
+        <Typography variant='h5' fontWeight='normal'>All problems</Typography>
         <Button variant='outlined' size='small' sx={{textTransform:'none', fontSize:'15px'}} onClick={()=>{router.push('/addproblem')}}>Add problem</Button>
       </div>
 
@@ -102,11 +102,11 @@ export default function Home() {
                     </TableHead>
                     <TableBody>
                       {allProblems.map((problem) => (
-                          <TableRow key={problem.title} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                            <TableCell component="th" scope="row">{problem.problemCode}</TableCell>
-                            <TableCell>{problem.title}</TableCell>
-                            <TableCell>{problem.category}</TableCell>
-                            <TableCell>{problem.difficulty}</TableCell>
+                          <TableRow key={problem.title} sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor:'pointer' }}>
+                            <TableCell component="th" scope="row" onClick={function(){router.push('/editproblem/'+problem.problemCode)}}>{problem.problemCode}</TableCell>
+                            <TableCell onClick={function(){router.push('/editproblem/'+problem.problemCode)}}>{problem.title}</TableCell>
+                            <TableCell onClick={function(){router.push('/editproblem/'+problem.problemCode)}}>{problem.category}</TableCell>
+                            <TableCell onClick={function(){router.push('/editproblem/'+problem.problemCode)}}>{problem.difficulty}</TableCell>
                           </TableRow>
                       ))}
                     </TableBody>

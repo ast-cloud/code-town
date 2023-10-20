@@ -96,8 +96,8 @@ export default function Problems({session}: any){
 
           <div style={{marginTop:'4vh', marginBottom:'8vh'}}>
             <Tabs value={selectedTab} onChange={handleTabChange} centered sx={{display:'flex', justifyContent: 'space-between'}}>
-              <Tab label="Courses" />
-              {session && <Tab label="Purchased Courses" />}
+              <Tab label="Problems" />
+              {session && <Tab label="Solved Problems" />}
             </Tabs>
           </div>
 
