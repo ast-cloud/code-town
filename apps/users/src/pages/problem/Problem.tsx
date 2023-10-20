@@ -168,6 +168,13 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
             if(results.data.accepted==true){
                 setCodeSubmissionLoading(false);
                 setCodeSubmissionStatus({visible:true, accepted: true, message: results.data.result});
+                if(results.data.saved==true){
+                    setSnackbar({
+                        open: true,
+                        text: 'Progress saved!',
+                        severity: 'success'
+                    })
+                }
             }
             else{
                 setCodeSubmissionLoading(false);

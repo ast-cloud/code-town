@@ -1,8 +1,11 @@
 // Route to submit the solution of a particular problem
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ensureDBConnected } from '@/lib/dbConnect';
-import { Problem } from "db";
+import { Problem, User } from "db";
 import axios from 'axios';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]';
+
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse){
@@ -35,15 +38,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 
                 console.log('Result - '+String(eo===co));
                 if(eo===co){
-                    res.status(200).json({'accepted':true, 'result':'Hoorray! All test cases passed successfully'});
+                    const session = await getServerSession(req, res, authOptions);
+                    if(session){
+                        var user = await User.findOne({email: session['user'].email});
+                        if(user){
+                            user.solvedProblems.push(problem);
+                            await user.save();
+                            res.status(200).json({'accepted':true, 'result':'Hoorray! All test cases passed successfully', 'saved':true});
+                            return;
+                        }
+                        else{
+                            res.status(200).json({'accepted':true, 'result':'Hoorray! All test cases passed successfully', 'saved':false});
+                            return;
+                        }
+                    }
+                    else{
+                        res.status(200).json({'accepted':true, 'result':'Hoorray! All test cases passed successfully', 'saved':false});
+                        return;
+                    }
                 }
                 else{
-                    res.status(200).json({'accepted':false, 'result':'Wrong answer'});
+                    res.status(200).json({'accepted':false, 'result':'Wrong answer', 'saved':false});
+                    return;
                 }
 
             }
             else{
-                res.status(200).json({'accepted':false, 'result':`${codeExecutionOutput.data.error} : ${codeExecutionOutput.data.output}`});
+                res.status(200).json({'accepted':false, 'result':`${codeExecutionOutput.data.error} : ${codeExecutionOutput.data.output}`, 'saved':false});
             }
                 
         }catch(e){
