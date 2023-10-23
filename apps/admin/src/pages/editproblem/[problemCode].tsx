@@ -163,6 +163,29 @@ export default function EditProblem(){
         });
     }
 
+    function handleDeleteProblem(){
+        axios.delete('/api/deleteProblem/'+problemCode, {
+            headers:{
+                'Authorization':'Bearer '+localStorage.getItem('token')
+            }
+        }).then(function(res){
+            if(res.status==200){
+                router.push('/');
+                setSnackbar({
+                    open: true,
+                    text: 'Problem deleted successfully',
+                    severity: 'success'
+                });
+            }
+        }).catch(function(res){
+            setSnackbar({
+                open: true,
+                text: 'Cannot delete problem. Please try again!',
+                severity: 'error'
+            });
+        });
+    }
+
     function handleDifficultyChange(event: SelectChangeEvent){
         setDifficulty(event.target.value as string);
     }
@@ -213,7 +236,7 @@ export default function EditProblem(){
                 </div>
                 {selectedTab==0 && <div>
 
-                    <div style={{display:'flex', marginLeft:'1vw', border:'0px solid black'}}>
+                    <div style={{display:'flex', marginLeft:'1vw', marginRight:'1vw', border:'0px solid black'}}>
                         <TextField variant='outlined' size='small' label='Problem Code' defaultValue={problemDetails.problemCode} onChange={()=>{}} disabled></TextField>
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <TextField variant='outlined' size='small' label='Title' sx={{width:'20vw'}} defaultValue={problemDetails.title} onChange={function(e){setTitle(e.target.value)}}></TextField>
@@ -237,6 +260,7 @@ export default function EditProblem(){
                                 }
                             </Select>
                         </FormControl>
+                        <Button variant='contained' size='small' sx={{justifySelf:'flex-end', marginLeft:'auto', textTransform:'none', backgroundColor:'#C70000', fontSize:'15px', width:'75px', height:'35px'}} onClick={handleDeleteProblem}>Delete</Button>
                     </div>
         
                     <br /><br />
