@@ -69,7 +69,7 @@ export default function Login() {
 
   return <div style={{height:'70vh', border:'0px solid black'}}>
         <div style={{display:'flex', justifyContent:'center', marginTop:75}}>     
-            <Typography variant="h6">Course Hub admin sign In</Typography>
+            <Typography variant="h6">Code Town admin sign In</Typography>
         </div>
         <div style={{display:'flex', justifyContent:'center'}}>
             <Card variant="outlined" style={{width:400, padding:70, marginTop:20, borderRadius:'8px'}}>
