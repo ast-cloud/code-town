@@ -20,6 +20,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const requiredFields = ['problemCode', 'title', 'description', 'difficulty', 'category', 'inputCases', 'expectedOutput'];
             const allFieldsExist = requiredFields.every((field)=>{return field in newProblem});
             if(allFieldsExist){
+                var duplicate = await Problem.findOne({problemCode: req.body.problemCode});
+                if(duplicate){
+                    res.status(409).json({'Conflict':'Problem code already exists.'});
+                    return;
+                }
                 var a = new Problem(newProblem);
                 await a.save();
                 res.status(200).json({message:'Problem added successfully', problemId: a.id});
