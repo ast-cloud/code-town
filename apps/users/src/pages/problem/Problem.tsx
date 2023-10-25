@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import {useRouter} from 'next/router';
 import axios from 'axios';
-import { Typography, Button, Tab, Tabs, CircularProgress, Select, MenuItem, FormControl, InputLabel, Snackbar, Alert } from '@mui/material';
+import { Typography, Button, Tab, Tabs, CircularProgress, Select, MenuItem, FormControl, InputLabel, Snackbar, Alert, useMediaQuery } from '@mui/material';
 import { themeColors } from 'ui';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -73,8 +73,6 @@ class Codetown
 export default function Problem(props: {problemCode:string|string[]|undefined}){
 
     const router = useRouter();
-
-    //const problemCode = router.query.problemCode;
 
     const [problemDetails, setProblemDetails] = useState<undefined|null|ProblemDetailsInfo>(undefined);
     const [reRender, setReRender] = useState(false);
@@ -154,9 +152,7 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
 
     },[reRender]);
 
-    const handleLanguageChange = function(event){
-        setLanguage(event.target.value as string);
-    }
+    
 
     const handleCodeSubmit = async function(){
         setCodeSubmissionLoading(true);
@@ -197,6 +193,9 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
     const handleTabChange = (event: React.SyntheticEvent, newValue: any) => {
         setSelectedTab(newValue);
     };
+
+    var isWidthLessThan950 = useMediaQuery('(max-width: 950px)');
+    var isWidthLessThan720 = useMediaQuery('(max-width: 720px)');
 
     if(problemDetails===undefined){
         return(
@@ -248,6 +247,7 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
                 setPythonCode(val);
             }
         }
+        
         return(
             <div>
                 <div style={{display:'flex', marginTop:'20px', marginBottom:'2vh', paddingLeft:'10px'}}>
@@ -256,76 +256,79 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
                     &nbsp;&nbsp;
                     <Typography variant='body1' marginTop='5px'>{`(P Code : ${problemDetails.problemCode})`}</Typography>
                 </div>
-                <div style={{height:'7vh', backgroundColor:'#F8F8F8', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-                    <div style={{display:'flex', justifyContent:'space-between', width:'48vw', border:'0px solid black'}}>
-                        {/* <Typography variant='subtitle1' sx={{fontWeight:'bold', marginLeft:'1vw'}}>Statement</Typography> */}
+                <div style={{height:'7vh', backgroundColor:'#F8F8F8', display:'flex', alignItems:'center', justifyContent:'space-between', border:'0px solid black'}}>
+                    <div style={{display:'flex', justifyContent:'space-between', width: isWidthLessThan720?'100vw':'48vw', border:'0px solid black'}}>
                             
                         <Tabs value={selectedTab} onChange={handleTabChange} >
                             <Tab label='Statement'/>
                             <Tab label='Solution'/>
+                            <Tab label='IDE' sx={{display: isWidthLessThan950?'flex':'none'}}/>
                         </Tabs>
-                        <Typography variant='subtitle1' sx={{fontWeight:'bold', marginRight:'1vw', marginTop:'10px'}}>Difficulty: {problemDetails.difficulty}</Typography>
+                        <Typography variant='subtitle1' color={'#363636'} sx={{fontWeight:'lighter', marginRight:'1vw', marginTop:'10px', display: isWidthLessThan950?'none':'block'}}>Difficulty: {problemDetails.difficulty}</Typography>
                     </div>
-                    <div style={{display:'flex', justifyContent:'flex-end', width:'52vw', border:'0px solid black'}}>
-                        <FormControl>
-                            <InputLabel id='language-dropdown' size='small'>Language</InputLabel>
-                            <Select label='Language' labelId='language-dropdown' size='small' sx={{width:200, fontSize:16}} value={language} onChange={handleLanguageChange}>
-                                <MenuItem value='c'>C</MenuItem>
-                                <MenuItem value='cpp'>C++ 14</MenuItem>
-                                <MenuItem value='java'>Java</MenuItem>
-                                {/* <MenuItem value='javascript'>JavaScript</MenuItem> */}
-                                <MenuItem value='python'>Python</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </div>
+                    {!isWidthLessThan720 && <div style={{display:'flex', justifyContent:'flex-end', width:'52vw', border:'0px solid black'}}>
+                        <LanguageDropdown language={language} setLanguage={setLanguage}/>
+                    </div>}
                     
                 </div>
                 <div style={{display:'flex'}}>
-                    <div style={{width:'50vw', height:'auto', paddingLeft:'20px', paddingRight:'15px', paddingBottom:'20px', overflowX:'auto', border:'0px solid black'}}>
-                        { selectedTab===0 && <Typography style={{fontWeight:'lighter', fontSize:'17px', whiteSpace:'pre-wrap', marginTop:'25px'}} dangerouslySetInnerHTML={{__html:String(problemDetails.description)}} />
-                        //     {problemDetails.description}
-                        // </Typography>
-                        }
-                        <br /><br />
+            
+                    <div style={{width: isWidthLessThan950?'100vw':'50vw', height:'75vh', paddingLeft:'20px', paddingRight:'15px', paddingBottom:'20px', overflowX:'auto', border:'0px solid black'}}>
+                        { selectedTab===0 && <div style={{display:'flex', flexDirection:'column', marginTop:'20px'}}>
+                                {isWidthLessThan950 && <Typography color={'grey'} sx={{alignSelf:'flex-end', marginRight:'10px'}}>Difficulty: {problemDetails.difficulty}</Typography>}
+                                <Typography style={{fontWeight:'lighter', fontSize:'17px', whiteSpace:'pre-wrap', marginTop:'5px'}} dangerouslySetInnerHTML={{__html:String(problemDetails.description)}} />
+                            </div>}
+                        <br />
                         { selectedTab===1 && solutions && <div style={{border:'0px solid black'}}>
-                                <FormControl>
-                                    <InputLabel id='language-dropdown' size='small'>Language</InputLabel>
-                                    <Select label='Language' labelId='language-dropdown' size='small' sx={{width:200, fontSize:16}} value={language} onChange={handleLanguageChange}>
-                                        <MenuItem value='c'>C</MenuItem>
-                                        <MenuItem value='cpp'>C++ 14</MenuItem>
-                                        <MenuItem value='java'>Java</MenuItem>
-                                        {/* <MenuItem value='javascript'>JavaScript</MenuItem> */}
-                                        <MenuItem value='python'>Python</MenuItem>
-                                    </Select>
-                                </FormControl>
+                                <LanguageDropdown language={language} setLanguage={setLanguage}/>
                                 <br /><br />
-                                <Typography variant='h6' whiteSpace='pre-wrap' marginLeft={'15px'}>{!solutions[language]?`\n ${language.charAt(0).toUpperCase()+language.slice(1)} solution not provided yet!`:solutions[language]}</Typography>
+                                <Typography variant='subtitle1' whiteSpace='pre-wrap' marginLeft={'15px'}>{!solutions[language]?`\n ${language.charAt(0).toUpperCase()+language.slice(1)} solution not provided yet!`:solutions[language]}</Typography>
                             </div>}
 
                         {selectedTab===1 && solutions===undefined && <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginTop:'20%'}}> <CircularProgress/> </div>}
 
                         {selectedTab===1 && solutions===null && <div style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', height:'64vh'}}> <Typography variant='h6' sx={{fontWeight:'bold'}}>Cannot load data!</Typography> <br /><br /> <Button variant='contained' size='small' sx={{ textTransform:'none', backgroundColor:'#645cff'}} onClick={function(){setSolutions(undefined); setReRender(!reRender);}}>Refresh</Button> </div>}
+
                         {selectedTab===1 && solutions===false && <div style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', height:'64vh'}}> <Typography variant='h6' sx={{}}>No solutions provided yet!</Typography> </div>}
 
-                    </div>
-                    <div style={{display:'flex', flexDirection:'column'}}>
+                        {selectedTab===2 && isWidthLessThan950 && <div style={{display:'flex', flexDirection:'column'}}>
+                            {isWidthLessThan720 && <div style={{alignSelf:'flex-end'}}><LanguageDropdown language={language} setLanguage={setLanguage}/></div>}
+                            <br />
+                            <div style={{width:'100%', height:'70vh', border:'5px solid #282C34', borderRadius:'5px'}}>
+                                <CodeMirror value={codeValue[language]} lang={languageModes[language]} onChange={(val) => setCodeFunction(val)} ref={editorRef} minHeight="70vh" maxHeight="70vh" basicSetup={{highlightActiveLineGutter: true, highlightActiveLine: true, syntaxHighlighting: true}} style={{fontSize:'18px'}} theme={'dark'} extensions={[languageExtensions[language], EditorView.lineWrapping]} onClick={()=>{}} />
+                            </div>
+                            <br />
+                            <div style={{display:codeSubmissionLoading?'flex':'none', justifyContent:'center'}}>
+                                <CircularProgress sx={{color:themeColors.Brown}}/>
+                            </div>
+                            <div style={{display:(!codeSubmissionLoading && codeSubmissionStatus.visible)?'flex':'none', flexDirection:'column', width:'50vw', maxHeight:'200px', overflowY:'auto', border:codeSubmissionStatus.accepted?'5px solid #ccff90':'5px solid #ffcdd2', backgroundColor: codeSubmissionStatus.accepted?'#ccff90':'#ffcdd2', borderRadius:'8px', paddingBottom:'5px'}}>
+                                <Typography variant='subtitle1' fontWeight={'bold'} color={codeSubmissionStatus.accepted?'green':'red'} style={{marginLeft:'5px'}}>Status : </Typography>
+                                <Typography variant='body1' whiteSpace='pre-wrap' color={codeSubmissionStatus.accepted?'green':'red'} style={{marginLeft:'35px'}}>{codeSubmissionStatus.message}</Typography>
+                            </div>
+                            <br />
+                            <Button variant='contained' sx={{width:'100px', alignSelf:'flex-end', textTransform:'none', letterSpacing:2, backgroundColor:themeColors.Brown}} onClick={handleCodeSubmit}>Submit</Button>
+                        
+                        </div>}
 
-                        <div style={{width:'50vw', height:'70vh', border:'5px solid #282C34', borderRadius:'5px'}}>
+                    </div>
+
+                    {!isWidthLessThan950 && <div style={{display:'flex', width:'50vw', marginRight:'5px', flexDirection:'column'}}>
+                        <div style={{width:'100%', height:'70vh', border:'5px solid #282C34', borderRadius:'5px'}}>
                             <CodeMirror value={codeValue[language]} lang={languageModes[language]} onChange={(val) => setCodeFunction(val)} ref={editorRef} minHeight="70vh" maxHeight="70vh" basicSetup={{highlightActiveLineGutter: true, highlightActiveLine: true, syntaxHighlighting: true}} style={{fontSize:'18px'}} theme={'dark'} extensions={[languageExtensions[language], EditorView.lineWrapping]} onClick={()=>{}} />
                         </div>
                         <br />
-                        
                         <div style={{display:codeSubmissionLoading?'flex':'none', justifyContent:'center'}}>
                             <CircularProgress sx={{color:themeColors.Brown}}/>
                         </div>
-                        <div style={{display:(!codeSubmissionLoading && codeSubmissionStatus.visible)?'flex':'none', flexDirection:'column', width:'50vw', maxHeight:'200px', overflowY:'auto', border:codeSubmissionStatus.accepted?'5px solid #ccff90':'5px solid #ffcdd2', backgroundColor: codeSubmissionStatus.accepted?'#ccff90':'#ffcdd2', borderRadius:'8px', paddingBottom:'5px'}}>
+                        <div style={{display:(!codeSubmissionLoading && codeSubmissionStatus.visible)?'flex':'none', flexDirection:'column', width:'100%', maxHeight:'200px', overflowY:'auto', border:codeSubmissionStatus.accepted?'5px solid #ccff90':'5px solid #ffcdd2', backgroundColor: codeSubmissionStatus.accepted?'#ccff90':'#ffcdd2', borderRadius:'8px', paddingBottom:'5px'}}>
                             <Typography variant='subtitle1' fontWeight={'bold'} color={codeSubmissionStatus.accepted?'green':'red'} style={{marginLeft:'5px'}}>Status : </Typography>
                             <Typography variant='body1' whiteSpace='pre-wrap' color={codeSubmissionStatus.accepted?'green':'red'} style={{marginLeft:'35px'}}>{codeSubmissionStatus.message}</Typography>
                         </div>
                         <br />
                         <Button variant='contained' sx={{width:'100px', alignSelf:'flex-end', textTransform:'none', letterSpacing:2, backgroundColor:themeColors.Brown}} onClick={handleCodeSubmit}>Submit</Button>
                        
-                    </div>
+                    </div>}
+                    
                 </div>
                 <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={handleSnackbarClose} anchorOrigin={{vertical:'bottom', horizontal:'center'}}><Alert severity={snackbar.severity=='error'?"error":"success"}>{snackbar.text}</Alert></Snackbar>
             </div>
@@ -333,4 +336,24 @@ export default function Problem(props: {problemCode:string|string[]|undefined}){
     }
 
     
+}
+
+function LanguageDropdown({language, setLanguage}){
+
+    const handleLanguageChange = function(event){
+        setLanguage(event.target.value as string);
+    }
+
+    return (
+        <FormControl>
+            <InputLabel id='language-dropdown' size='small'>Language</InputLabel>
+            <Select label='Language' labelId='language-dropdown' size='small' sx={{width:200, fontSize:16, color:'#363636', backgroundColor:'white'}} value={language} onChange={handleLanguageChange}>
+                <MenuItem value='c'>C</MenuItem>
+                <MenuItem value='cpp'>C++ 14</MenuItem>
+                <MenuItem value='java'>Java</MenuItem>
+                {/* <MenuItem value='javascript'>JavaScript</MenuItem> */}
+                <MenuItem value='python'>Python</MenuItem>
+            </Select>
+        </FormControl>
+    );
 }
