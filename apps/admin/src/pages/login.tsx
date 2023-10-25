@@ -42,7 +42,6 @@ export default function Login() {
       username: email,
       password: password
     }).then(function(res){
-        console.log('res.status - ', res.status);
         if(res.status==200){
             localStorage.setItem('token', res.data.token);
             setIsLoggedIn(true);
@@ -59,7 +58,6 @@ export default function Login() {
             text: 'Login Failed. Please try again!',
             severity: 'error'
         });
-        console.log('res - '+res);
       });      
   }
 

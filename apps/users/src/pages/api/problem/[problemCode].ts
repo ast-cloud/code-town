@@ -4,15 +4,12 @@ import { ensureDBConnected } from '@/lib/dbConnect';
 import { Problem } from "db";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse){
-    console.log('firsttttttttttttt')
     
     const problemCode = req.query.problemCode;
 
     if(req.method=='GET'){
-        console.log('here')
         try{
             await ensureDBConnected();
-            console.log('db connected');
             var problem = await Problem.findOne({problemCode: problemCode}, {problemCode:1, title:1, category:1, difficulty:1, description:1});
             if(!problem){
                 res.status(404).json({'Error':'Problem not found'});

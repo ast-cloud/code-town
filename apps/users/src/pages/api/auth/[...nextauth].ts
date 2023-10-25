@@ -19,7 +19,6 @@ export const authOptions: any = {
       },
       async authorize(credentials, req) {
         
-        console.log(JSON.stringify('Inside authorize, credentials - '), credentials);
         
         if(!credentials){
           return Promise.resolve(null);
@@ -27,7 +26,6 @@ export const authOptions: any = {
 
         const user = await checkCreds(credentials.email, credentials.password);
 
-        console.log('Inside authorize, user - ', user);
 
         if (user) {
           return Promise.resolve(user);

@@ -107,7 +107,6 @@ export default function AddProblem(){
                 }
             });
             if(res.status==200){
-                console.log('Success res.status - ', JSON.stringify(res.status));
                 router.push('/');
                 setSnackbar({
                     open: true,
@@ -119,7 +118,6 @@ export default function AddProblem(){
                 console.log('res.status inside try block - ', res.status)
             }
         }catch(error){
-            console.log('error.status - ', JSON.stringify(error.response.status))
             if(error.response.status==409){
                 setSnackbar({
                     open: true,
@@ -136,41 +134,6 @@ export default function AddProblem(){
             }
         }
 
-        // axios.post('/api/addProblem', {
-        //     problemCode: problemCode,
-        //     title: title,
-        //     difficulty: difficulty,
-        //     category: category,
-        //     description: formattedDescription,
-        //     inputCases: inputCases,
-        //     expectedOutput: expectedOutput
-        // }, {
-        //     headers:{
-        //         'Authorization':'Bearer '+localStorage.getItem('token')
-        //     }
-        // }).then(function(res){
-        //     if(res.status==200){
-        //         console.log('Saved response code - ', res.status)
-        //         router.push('/');
-        //         setSnackbar({
-        //             open: true,
-        //             text: 'Problem added successfully',
-        //             severity: 'success'
-        //         });
-        //     }
-        //     if(res.status==409){
-        //         console.log('thennnnnnnnnnn')
-        //     }
-        // }).catch(function(error){
-        //     //if(res.status==409){
-        //         console.log('error - ', JSON.stringify(error.code))
-        //     //}
-        //     setSnackbar({
-        //         open: true,
-        //         text: 'Cannot add problem. Please try again!',
-        //         severity: 'error'
-        //     });
-        // });
     }
 
     const handleSnackbarClose = () => {
@@ -178,7 +141,6 @@ export default function AddProblem(){
       };
       
     const QuillOnChange = (value)=>{
-        console.log('Current quill text value - '+String(value));
         setFormattedDescription(value);
     }
 

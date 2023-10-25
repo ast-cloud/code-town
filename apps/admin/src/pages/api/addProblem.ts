@@ -36,7 +36,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return;
 
         }catch(error){
-            console.log('Error - ', error);
             res.status(500).send('Internal server error');
         }
     }

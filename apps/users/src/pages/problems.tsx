@@ -56,7 +56,6 @@ export default function Problems({session}: any){
           try{
   
             var solved_problems_details = await axios.get('/api/solvedProblems');
-            console.log('solvedProblems?.length - '+solvedProblems);
             if(solved_problems_details.status==200){
               setSolvedProblems(solved_problems_details.data.solvedProblemsDetails);
             }
@@ -168,6 +167,5 @@ export default function Problems({session}: any){
 export async function getServerSideProps(context: any){
 
   const session = await getServerSession(context.req, context.res, authOptions);  
-  console.log('Inside getServerSideProps, session - ', session);
   return { props: {session} };
 }

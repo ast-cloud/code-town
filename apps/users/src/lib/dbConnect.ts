@@ -6,6 +6,5 @@ export async function ensureDBConnected(){
     if(alreadyDone)
         return;
     alreadyDone=true;
-    console.log('lalala')
     await mongoose.connect(process.env.MONGO_URL as string);
 }

@@ -18,13 +18,11 @@ export async function saveUserData(email: string, name: string){
         else{
             var newUser = new User({email: email, name: name});
             await newUser.save();
-            console.log('New user inserted in database:', newUser);
         }
 
         return true;
 
     }catch(error){
-        console.log('error caught - ',JSON.stringify(error));
         return false;
     }
 

@@ -23,7 +23,6 @@ function App2({Component, pageProps}: AppProps){
 
   const router = useRouter();
   const session = useSession();
-console.log('router.pathname - '+router.pathname);
   return <div className='background-image'>
     {!(/^\/problem\/\[[a-zA-Z0-9]+\]$/.test(router.pathname)) && <AppBar router={router} session={session} signIn={signIn} signOut={signOut} ></AppBar>}
     <Component {...pageProps} />

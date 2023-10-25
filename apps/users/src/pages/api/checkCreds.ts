@@ -17,7 +17,6 @@ export async function checkCreds(email: string, password: string){
                 }
             }
             else{
-                console.log('About to create new userrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
                 var newUser = new User({email: email, password: password, name: '', image:''});
                 await newUser.save();
                 return {'email': email, 'password': password, name: '', image: ''};

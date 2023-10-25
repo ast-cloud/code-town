@@ -202,7 +202,6 @@ export default function EditProblem(){
     };
 
     const QuillOnChange = (value)=>{
-        console.log('Current quill text value - '+String(value));
         setFormattedDescription(value);
     }
 
