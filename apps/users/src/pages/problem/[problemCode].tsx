@@ -7,15 +7,6 @@ import { themeColors } from 'ui';
 import dynamic from 'next/dynamic';
 
 
-// type ProblemDetailsInfo = {
-//     problemCode: string;
-//     title: string;
-//     description: string;
-//     category: string;
-//     difficulty: string;
-//   }
-
-
 const DynamicallyLoadedProblemComponent = dynamic(function(){return import('./Problem')}, {
     loading: ()=><div style={{display:'flex', justifyContent:'center', alignItems:'center', height:'74vh'}}>
             <CircularProgress/>
