@@ -104,7 +104,7 @@ export default function Problems({session}: any){
           </div>
 
 
-          {selectedTab===0 && <TableContainer component={Paper} sx={{maxWidth:'95vw', alignSelf:'center'}}>
+          {selectedTab===0 && <TableContainer component={Paper} sx={{maxWidth:'95vw', minHeight:'55vh', alignSelf:'center'}}>
                 <Table sx={{ minWidth: 500 }} aria-label="simple table">
                     <TableHead>
                       <TableRow>
