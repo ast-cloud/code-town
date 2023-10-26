@@ -5,6 +5,7 @@ import { Typography, Card, TextField, Button, Snackbar, Alert } from '@mui/mater
 import { useRecoilState } from 'recoil';
 import { isAdminLoggedInState } from '@/store/atoms/user';
 import axios from 'axios';
+import { themeColors } from 'ui';
 
 export default function Login() {
 
@@ -75,7 +76,7 @@ export default function Login() {
                 <br/><br/>
                 <TextField variant="outlined" fullWidth={true} label='Password' type='password' onChange={function(e){setPassword(e.target.value)}} onKeyUp={function(e){if(e.key=='Enter'){handleSignIn();}}}></TextField>
                 <br/><br/><br/><br/>
-                <Button variant="contained" fullWidth={true} sx={{backgroundColor:'#645cff'}} onClick={handleSignIn}>Sign In</Button>
+                <Button variant="contained" fullWidth={true} sx={{backgroundColor:themeColors.Brown}} onClick={handleSignIn}>Sign In</Button>
             </Card>
         </div>
         <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={handleSnackbarClose} anchorOrigin={{vertical:'bottom', horizontal:'center'}}><Alert severity={snackbar.severity=='error'?"error":"success"}>{snackbar.text}</Alert></Snackbar>
