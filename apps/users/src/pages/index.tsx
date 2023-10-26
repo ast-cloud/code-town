@@ -19,7 +19,7 @@ export default function Home() {
             <div style={{marginTop:0}}>  
               <Typography variant='h5' style={{fontWeight: 'normal', alignSelf:'center'}}>Start your coding journey now</Typography>
             </div>
-            <div style={{marginTop:0, width:'90%', alignSelf:'center'}}>  
+            <div style={{marginTop:0, width:'90%', alignSelf:'center'}}>
               <Typography variant='h6' style={{fontWeight: 'normal'}}>Unleash your inner programmer and embark on a digital journey like no other. Whether you&apos;re a seasoned developer or just taking your first steps into the world of code, you&apos;ve arrived at the perfect destination. </Typography>
             </div>
             <div style={{display:'flex', width:'80%', justifyContent:'space-evenly', alignItems:'flex-start', marginBottom:0}}>
@@ -42,7 +42,6 @@ export default function Home() {
 
           <Grid item container xs={12} md={6} sx={{order:{xs: 1, md: 1},  backgroundColor:''}} justifyContent='center' alignItems='center'>
             <div style={{}}>
-              {/* <Image src='/idea.gif' width={250} height={250} alt='' /> */}
               <video autoPlay muted loop playsInline width={280} height={280}>
                 <source src='idea.mp4' type='video/mp4'/>
               </video>
@@ -76,7 +75,6 @@ export default function Home() {
 
           <Grid item container xs={12} md={7} sx={{order:{xs: 1, md: 2},  backgroundColor:''}} justifyContent='center' alignItems='center'>
             <div >
-              {/* <Image src='/rocket.svg' fill alt='' className='image'/> */}
               <video autoPlay muted loop playsInline width={280} height={280}>
                 <source src='rocket.mp4' type='video/mp4'/>
               </video>
