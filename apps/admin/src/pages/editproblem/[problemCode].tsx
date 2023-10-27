@@ -14,6 +14,14 @@ import { cpp } from '@codemirror/lang-cpp';
 import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { EditorView } from '@codemirror/view';
+//import RichTextEditor from '@/components/RichTextEditor';
+import dynamic from 'next/dynamic';
+const RichTextEditor = dynamic(function(){return import('@/components/RichTextEditor')}, {
+    loading: ()=><div style={{display:'flex', justifyContent:'center', alignItems:'center', height:'74vh'}}>
+            <CircularProgress/>
+        </div>,
+    ssr: false
+});
 
 type ProblemDetailsInfo = {
     problemCode: string;
@@ -266,8 +274,9 @@ export default function EditProblem(){
         
                     <div style={{display:'flex', flexDirection:'column', marginLeft:'1vw', marginRight:'1vw', border:'0px solid black'}}>
                         {/* <TextField variant='outlined' fullWidth label='Description' multiline minRows={15} maxRows={20} onChange={function(e){setDescription(e.target.value)}}></TextField> */}
-                        <EditorToolbar />
-                        <ReactQuill theme="snow" style={{height:'60vh', width:'90vw', marginBottom:'2vh', border:'1px solid black', borderRadius:'5px', overflow:'auto'}} placeholder='Description' modules={modules} formats={formats} defaultValue={problemDetails.description} onChange={QuillOnChange} />
+                        <RichTextEditor initialDescription={problemDetails.description} setFormattedDescription={setFormattedDescription}/>
+                        {/* <EditorToolbar />
+                        <ReactQuill theme="snow" style={{height:'60vh', width:'90vw', marginBottom:'2vh', border:'1px solid black', borderRadius:'5px', overflow:'auto'}} placeholder='Description' modules={modules} formats={formats} defaultValue={problemDetails.description} onChange={QuillOnChange} /> */}
                     </div>
 
                     <br /><br />

@@ -6,9 +6,16 @@ import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import { isAdminLoggedInState } from '@/store/atoms/user';
 import {useRouter} from 'next/router';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import EditorToolbar, { modules, formats } from "../components/EditorToolbar";
+// import ReactQuill from 'react-quill';
+// import 'react-quill/dist/quill.snow.css';
+// import EditorToolbar, { modules, formats } from "../components/EditorToolbar";
+import dynamic from 'next/dynamic';
+const RichTextEditor = dynamic(function(){return import('@/components/RichTextEditor')}, {
+    loading: ()=><div style={{display:'flex', justifyContent:'center', alignItems:'center', height:'74vh'}}>
+            <CircularProgress/>
+        </div>,
+    ssr: false
+});
 
 
 type CategoryInfo = {
@@ -196,8 +203,9 @@ export default function AddProblem(){
     
                 <div style={{display:'flex', flexDirection:'column', marginLeft:'1vw', marginRight:'1vw', border:'0px solid black'}}>
                     {/* <TextField variant='outlined' fullWidth label='Description' multiline minRows={15} maxRows={20} onChange={function(e){setDescription(e.target.value)}}></TextField> */}
-                    <EditorToolbar />
-                    <ReactQuill theme="snow" style={{height:'60vh', width:'90vw', marginBottom:'2vh', border:'1px solid black', borderRadius:'5px', overflow:'auto'}} placeholder='Description' modules={modules} formats={formats} value={formattedDescription} onChange={QuillOnChange} />
+                    <RichTextEditor initialDescription={''} setFormattedDescription={setFormattedDescription}/>
+                    {/* <EditorToolbar />
+                    <ReactQuill theme="snow" style={{height:'60vh', width:'90vw', marginBottom:'2vh', border:'1px solid black', borderRadius:'5px', overflow:'auto'}} placeholder='Description' modules={modules} formats={formats} value={formattedDescription} onChange={QuillOnChange} /> */}
                 </div>
 
                 <br /><br />
