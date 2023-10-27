@@ -1,9 +1,5 @@
-import { useEffect, useState } from 'react';
 import {useRouter} from 'next/router';
-import axios from 'axios';
-import { useSession, signIn } from 'next-auth/react';
-import { Typography, Button, Tab, Tabs, CircularProgress } from '@mui/material';
-import { themeColors } from 'ui';
+import { CircularProgress } from '@mui/material';
 import dynamic from 'next/dynamic';
 
 
