@@ -23,7 +23,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
             console.log('Problem found - '+JSON.stringify(problem));
             const language = String(req.body.language);
-            console.log('language -------------------------- '+language);
+            console.log('Language - '+language);
+            console.log('Hitting codeRunner url - ', String(process.env.CODE_RUNNER_URL));
             var codeExecutionOutput = await axios.post(`${process.env.CODE_RUNNER_URL}/${language}`, {
                 code: req.body.code,
                 input: problem.inputCases
