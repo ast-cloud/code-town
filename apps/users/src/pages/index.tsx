@@ -24,7 +24,7 @@ export default function Home() {
             <div style={{marginTop:0, width:'90%', alignSelf:'center'}}>
               <Typography variant='h6' style={{fontWeight: 'normal'}}>Unleash your inner programmer and embark on a digital journey like no other. Whether you&apos;re a seasoned developer or just taking your first steps into the world of code, you&apos;ve arrived at the perfect destination. </Typography>
             </div>
-            {session.data && <div style={{display:'flex', width:'80%', justifyContent:'space-evenly', alignItems:'flex-start', marginBottom:0}}>
+            {!(session.data) && <div style={{display:'flex', width:'80%', justifyContent:'space-evenly', alignItems:'flex-start', marginBottom:0}}>
               <Button variant='contained' size='small' sx={{ height: '100%', backgroundColor: themeColors.Brown, textTransform:'none', fontSize:15}} onClick={function(){signIn();}}>Login</Button>
               <Button variant='contained' size='small' sx={{ height: '100%', backgroundColor: themeColors.Brown, textTransform:'none', fontSize:15}} onClick={function(){signIn();}}>Signup</Button>
             </div>}
