@@ -83,7 +83,7 @@ export default function Home() {
       
       <div style={{display:'flex', justifyContent:isSmallScreen ? 'space-between' : 'space-between', marginTop:'7vh', marginBottom:'7vh', marginLeft:isSmallScreen ? '0' : '5vw', marginRight:isSmallScreen ? '0' : '5vw', fontWeight:'lighter'}}>
         <Typography variant='h5' fontWeight='normal'>All problems</Typography>
-        <Button variant='outlined' size='small' sx={{textTransform:'none', fontSize:'15px'}} onClick={()=>{router.push('/addproblem')}}>Add problem</Button>
+        <Button variant='outlined' size='small' sx={{textTransform:'none', fontSize:'15px', color:'green', borderColor:'green'}} onClick={()=>{router.push('/addproblem')}}>Add problem</Button>
       </div>
 
       {allProblems===undefined && <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginTop:'20%'}}> <CircularProgress/> </div>}
