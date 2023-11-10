@@ -17,20 +17,14 @@ export const authOptions: any = {
         email: { label: "Email", type: "text", placeholder: "jsmith@gmail.com" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials, req) {
-        
-        
+      async authorize(credentials, req) {        
         if(!credentials){
           return Promise.resolve(null);
         }
-
         const user = await checkCreds(credentials.email, credentials.password);
-
-
         if (user) {
           return Promise.resolve(user);
         }
-
         return Promise.resolve(null);
       }
     })
