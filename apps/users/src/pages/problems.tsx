@@ -8,8 +8,6 @@ import { authOptions } from './api/auth/[...nextauth]';
 import {useRouter} from 'next/router';
 
 
-
-
 type ProblemInfo = {
     problemCode: string;
     title: string;
