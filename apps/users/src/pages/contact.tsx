@@ -24,7 +24,6 @@ export default function Contact(){
                     <Button variant='contained' sx={{backgroundColor: themeColors.Brown}}>Submit</Button>
                 </Card>
             </div>
-
         </div>
     )
 }
